@@ -18,11 +18,10 @@ create policy "profiles_select_own_or_admin" on public.profiles for select using
 drop policy if exists "profiles_insert_own" on public.profiles;
 create policy "profiles_insert_own" on public.profiles for insert with check (id=auth.uid() and role='user');
 drop policy if exists "profiles_update_own" on public.profiles;
-create policy "profiles_update_own" on public.profiles for update using (id=auth.uid()) with check (id=auth.uid() and role=(select role from public.profiles where id=auth.uid()));
+create policy "profiles_update_own" on public.profiles for update using (id=auth.uid()) with check (id=auth.uid() and (role='user' or public.is_admin()));
 
 grant select, insert, update on public.profiles to authenticated;
 
-after create trigger not available in plain SQL; create the profile from the client fallback after signup.
-
+-- Após criar uma conta, o app cria automaticamente o perfil.
 -- Para promover um usuário a administrador, execute no SQL Editor:
 -- update public.profiles set role='admin' where id='UUID_DO_USUARIO';
